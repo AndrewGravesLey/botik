@@ -1,5 +1,6 @@
 import os
 import json
+import asyncio
 import logging
 from pathlib import Path
 import httpx
@@ -186,7 +187,7 @@ custom_buttons = load_custom_buttons()  # {"key": {"url": ..., "label": ...}}
 # ===========================================================================================
 
 
-def main_menu() -> InlineKeyboardMarkup:
+def main_menu(is_admin: bool = False) -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton("about me", callback_data="about")],
         [InlineKeyboardButton("🎮 Games", callback_data="games")],
@@ -196,6 +197,8 @@ def main_menu() -> InlineKeyboardMarkup:
     ]
     for key, btn in custom_buttons.items():
         keyboard.append([InlineKeyboardButton(btn["label"], url=btn["url"])])
+    if is_admin:
+        keyboard.append([InlineKeyboardButton("☀️ Погода в Питере", callback_data="weather")])
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -213,6 +216,13 @@ def games_menu() -> InlineKeyboardMarkup:
 
 def about_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([[InlineKeyboardButton("‹ Назад", callback_data="back")]])
+
+
+def weather_menu() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔄 Обновить", callback_data="weather")],
+        [InlineKeyboardButton("‹ Назад", callback_data="back")],
+    ])
 
 
 # --- Погода в Санкт-Петербурге (видно только тебе) ---
@@ -255,6 +265,15 @@ async def get_weather_spb() -> str:
         return "Не удалось получить погоду — проверь интернет и попробуй ещё раз."
 
 
+async def _delete_later(bot, chat_id: int, message_id: int, delay: float):
+    """Удаляет сообщение через delay секунд (для самоудаляющегося приветствия)."""
+    await asyncio.sleep(delay)
+    try:
+        await bot.delete_message(chat_id, message_id)
+    except Exception as e:
+        log.warning(f"Не удалось удалить сообщение {message_id} в чате {chat_id}: {e}")
+
+
 def _image_source(key: str):
     path = IMAGES[key]
     if path.startswith("http://") or path.startswith("https://"):
@@ -283,35 +302,33 @@ async def show_screen(chat_id: int, context: ContextTypes.DEFAULT_TYPE, image_ke
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     remember_user(update)
+    chat_id = update.effective_chat.id
+    is_admin = update.effective_user.id == ADMIN_ID
 
-    if update.effective_user.id == ADMIN_ID:
-        weather_kb = InlineKeyboardMarkup(
-            [[InlineKeyboardButton("☀️ Погода в Питере сейчас", callback_data="weather_spb")]]
-        )
-        await update.message.reply_text(
-            "Привет, Andrew! Хорошего дня! ❤️",
-            reply_markup=weather_kb,
-        )
+    if is_admin:
+        greeting_msg = await update.message.reply_text("Привет, Andrew! Хорошего дня! ❤️")
+        asyncio.create_task(_delete_later(context.bot, chat_id, greeting_msg.message_id, 5))
 
-    await show_screen(update.effective_chat.id, context, "main", WELCOME_TEXT, main_menu())
+    await show_screen(chat_id, context, "main", WELCOME_TEXT, main_menu(is_admin=is_admin))
 
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     chat_id = query.message.chat.id
+    is_admin = update.effective_user.id == ADMIN_ID
 
     if query.data == "about":
         await show_screen(chat_id, context, "main", ABOUT_TEXT, about_menu())
     elif query.data == "games":
         await show_screen(chat_id, context, "games", GAMES_TEXT, games_menu())
     elif query.data == "back":
-        await show_screen(chat_id, context, "main", WELCOME_TEXT, main_menu())
-    elif query.data == "weather_spb":
-        if update.effective_user.id != ADMIN_ID:
+        await show_screen(chat_id, context, "main", WELCOME_TEXT, main_menu(is_admin=is_admin))
+    elif query.data == "weather":
+        if not is_admin:
             return
         weather_text = await get_weather_spb()
-        await query.message.reply_text(weather_text)
+        await show_screen(chat_id, context, "main", weather_text, weather_menu())
 
 
 # ========================= АДМИН-КОМАНДЫ (управление функционалом) =========================

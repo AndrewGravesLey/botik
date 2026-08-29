@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 # ========================= НАСТРОЙКИ (заполни своими ссылками) =========================
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "ВСТАВЬ_СЮДА_СВОЙ_ТОКЕН")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "8966646842:AAE8deXGmAhJkyNI_rXUnGAbgXEAH1cJ7k8")
 
 # Картинки. Можно указать либо путь к локальному файлу (положи картинки в папку images/
 # рядом с bot.py), либо прямую ссылку на картинку (https://...jpg).
@@ -18,29 +18,24 @@ IMAGES = {
 }
 
 ABOUT_TEXT = (
-    "☆°•*⁀➷ * ~ О М Н Е ~ * ⁀➷•°☆\n\n"
-    "✧ Имя: ...\n"
-    "✧ Возраст: ...\n"
-    "✧ Немного о себе: ...\n\n"
-    "𝙩𝙝𝙖𝙣𝙠𝙨 𝙛𝙤𝙧 𝙫𝙞𝙨𝙞𝙩𝙞𝙣𝙜 ♡"
-)
+    "WoW, no info\n\n"
 
 LINKS = {
-    "pubg": "https://example.com/pubg",
-    "brawl": "https://example.com/brawlstars",
-    "steam1": "https://steamcommunity.com/id/твой_первый_профиль",
-    "steam2": "https://steamcommunity.com/id/твой_второй_профиль",
-    "roblox": "https://www.roblox.com/users/твой_id/profile",
-    "spotify": "https://open.spotify.com/user/твой_профиль",
-    "youtube": "https://www.youtube.com/@твой_канал",
-    "discord": "https://discord.gg/твой_инвайт",
+    "pubg": "https://t.me/+jqDtn3M099RmNmRi",
+    "brawl": "https://link.brawlstars.com/invite/friend/en/?tag=PR8P2VP0U",
+    "steam1": "https://steamcommunity.com/id/sodachkaikarys",
+    "steam2": "https://steamcommunity.com/id/76561198695464934",
+    "roblox": "https://www.roblox.com/share?code=615949c11b97e04db3de925976c0eaae&type=Profile&source=ProfileShare&stamp=1755272642929",
+    "spotify": "https://open.spotify.com/playlist/28P9qmooQM1MQ16d6uCjpz?si=Ors4RhKQQTKo7cmHLIhIsg&utm_source=copy-link&pi=xR0LjmeeR_eAl",
+    "youtube": "https://https://youtube.com/@milkiuis",
+    "discord": "https://discord.gg/GGCW4NWy",
 }
 
 # ========================================================================================
 
 def main_menu() -> InlineKeyboardMarkup:
     keyboard = [
-        [InlineKeyboardButton("☆ Обо мне ☆", callback_data="about")],
+        [InlineKeyboardButton("about me", callback_data="about")],
         [InlineKeyboardButton("🎮 Games", callback_data="games")],
         [InlineKeyboardButton("🎧 Spotify", url=LINKS["spotify"])],
         [InlineKeyboardButton("📺 YouTube", url=LINKS["youtube"])],
@@ -63,7 +58,6 @@ def games_menu() -> InlineKeyboardMarkup:
 
 WELCOME_TEXT = (
     "✦･ﾟ: *✧･ﾟ:*  W E L C O M E  *:･ﾟ✧*:･ﾟ✦\n\n"
-    "тут инфа обо мне и всё самое интересное ↓"
 )
 
 GAMES_TEXT = "🎮 ° • ˚ ˚ ˖  G A M E S  ˖ ˚ ˚ • ° 🎮\n\nвыбери куда хочешь заглянуть:"
@@ -115,7 +109,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def main():
-    if not BOT_TOKEN or BOT_TOKEN == "ВСТАВЬ_СЮДА_СВОЙ_ТОКЕН":
+    if not BOT_TOKEN or BOT_TOKEN == "8966646842:AAE8deXGmAhJkyNI_rXUnGAbgXEAH1cJ7k8":
         raise SystemExit("Не задан BOT_TOKEN. Укажи его в переменных окружения (см. README).")
 
     app = Application.builder().token(BOT_TOKEN).build()

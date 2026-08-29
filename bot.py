@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 # ========================= НАСТРОЙКИ (заполни своими ссылками) =========================
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "8966646842:AAE8deXGmAhJkyNI_rXUnGAbgXEAH1cJ7k8")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "ВСТАВЬ_СЮДА_СВОЙ_ТОКЕН")
 
 # Картинки. Можно указать либо путь к локальному файлу (положи картинки в папку images/
 # рядом с bot.py), либо прямую ссылку на картинку (https://...jpg).
@@ -27,7 +27,7 @@ LINKS = {
     "steam2": "https://steamcommunity.com/id/76561198695464934",
     "roblox": "https://www.roblox.com/share?code=615949c11b97e04db3de925976c0eaae&type=Profile&source=ProfileShare&stamp=1755272642929",
     "spotify": "https://open.spotify.com/playlist/28P9qmooQM1MQ16d6uCjpz?si=Ors4RhKQQTKo7cmHLIhIsg&utm_source=copy-link&pi=xR0LjmeeR_eAl",
-    "youtube": "https://https://youtube.com/@milkiuis",
+    "youtube": "https://youtube.com/@milkiuis",
     "discord": "https://discord.gg/GGCW4NWy",
 }
 
@@ -109,8 +109,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def main():
-    if not BOT_TOKEN or BOT_TOKEN == "8966646842:AAE8deXGmAhJkyNI_rXUnGAbgXEAH1cJ7k8":
-        raise SystemExit("Не задан BOT_TOKEN. Укажи его в переменных окружения (см. README).")
+    if not BOT_TOKEN or BOT_TOKEN == "ВСТАВЬ_СЮДА_СВОЙ_ТОКЕН":
+        raise SystemExit("Не задан BOT_TOKEN. Укажи его через export ВСТАВЬ_СЮДА_СВОЙ_ТОКЕН")
 
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))

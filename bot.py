@@ -61,6 +61,26 @@ def save_about(text: str):
 
 ABOUT_TEXT = load_about()
 
+# --- Хранение текста "Планы" в файле, меняется командой /setplans ---
+PLANS_FILE = Path("plans.json")
+DEFAULT_PLANS = "пока ничего не указано"
+
+
+def load_plans() -> str:
+    if PLANS_FILE.exists():
+        try:
+            return json.loads(PLANS_FILE.read_text(encoding="utf-8")).get("text", DEFAULT_PLANS)
+        except Exception:
+            pass
+    return DEFAULT_PLANS
+
+
+def save_plans(text: str):
+    PLANS_FILE.write_text(json.dumps({"text": text}, ensure_ascii=False), encoding="utf-8")
+
+
+PLANS_TEXT = load_plans()
+
 # --- Хранение связки "пересланное админу сообщение -> кто автор", чтобы отвечать людям ---
 RELAY_FILE = Path("relay_map.json")
 
@@ -191,6 +211,7 @@ def main_menu(is_admin: bool = False) -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton("about me", callback_data="about")],
         [InlineKeyboardButton("🎮 Games", callback_data="games")],
+        [InlineKeyboardButton("📅 Планы", callback_data="plans")],
         [InlineKeyboardButton("🎧 Spotify", url=LINKS["spotify"])],
         [InlineKeyboardButton("📺 YouTube", url=LINKS["youtube"])],
         [InlineKeyboardButton("💬 Discord", url=LINKS["discord"])],
@@ -322,6 +343,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_screen(chat_id, context, "main", ABOUT_TEXT, about_menu())
     elif query.data == "games":
         await show_screen(chat_id, context, "games", GAMES_TEXT, games_menu())
+    elif query.data == "plans":
+        text = f"Свободен ли я сегодня и какие вообще планы: {PLANS_TEXT}"
+        await show_screen(chat_id, context, "main", text, about_menu())
     elif query.data == "back":
         await show_screen(chat_id, context, "main", WELCOME_TEXT, main_menu(is_admin=is_admin))
     elif query.data == "weather":
@@ -347,6 +371,22 @@ async def set_about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ABOUT_TEXT = new_text + "\n\n"
     save_about(ABOUT_TEXT)
     await update.message.reply_text("Текст «Обо мне» обновлён ✅")
+
+
+async def set_plans(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/setplans текст — меняет текст в кнопке «Планы»."""
+    global PLANS_TEXT
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    new_text = update.message.text.partition(" ")[2].strip()
+    if not new_text:
+        await update.message.reply_text("Использование: /setplans текст твоих планов на сегодня")
+        return
+
+    PLANS_TEXT = new_text
+    save_plans(PLANS_TEXT)
+    await update.message.reply_text("Планы обновлены ✅")
 
 
 async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -563,6 +603,7 @@ def main():
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("setabout", set_about))
+    app.add_handler(CommandHandler("setplans", set_plans))
     app.add_handler(CommandHandler("stats", stats))
     app.add_handler(CommandHandler("broadcast", broadcast))
     app.add_handler(CommandHandler("block", block_user))

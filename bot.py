@@ -19,7 +19,7 @@ IMAGES = {
 
 ABOUT_TEXT = (
     "WoW, no info\n\n"
-
+)
 LINKS = {
     "pubg": "https://t.me/+jqDtn3M099RmNmRi",
     "brawl": "https://link.brawlstars.com/invite/friend/en/?tag=PR8P2VP0U",
